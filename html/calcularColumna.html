@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <meta charset="utf-8">
+    <title>Example</title>
+</head>
+<body onload="obtenerDatos()">
+<hr/>
+<table class="table table-striped">
+    <tr class="bg-info">
+        <th>id</th>
+        <th>Name</th>
+        <th>Trips</th>
+        <th>Quantity</th>
+        <th>Total</th>
+    </tr>
+
+    <tbody id="myTable">
+
+    </tbody>
+</table>
+
+Total:<input type="text" id="sum" value="0">
+
+<script>
+    function obtenerDatos() {
+
+        const url = "https://api.instantwebtools.net/v1/passenger?page=0&size=20"
+
+        fetch(url)
+            .then(response => response.json())
+            .then(res => {
+                console.log(res)
+                agregarDatosATabla(res.data)
+            })
+            .catch(error => console.log(error))
+
+
+    }
+
+    function agregarDatosATabla(result) {
+        let table = document.getElementById('myTable')
+        for (var i = 0; i < result.length; i++) {
+            var row = `<tr>
+							<td>${result[i]._id}</td>
+							<td>${result[i].name}</td>
+							<td><input type="text" class="qty" value="${result[i].trips}" disabled="true"/></td>
+                            <td><input type="text" class="price"></td>
+                            <td><input type="text" class="total"></td>
+
+					  </tr>`
+            table.innerHTML += row
+        }
+    }
+
+    (function () {
+        "use strict";
+        $("table").on("keyup", "input", function () {
+            var row = $(this).closest("tr");
+            var qty = parseFloat(row.find(".qty").val());
+            var price = parseFloat(row.find(".price").val());
+            var total = qty * price;
+            row.find(".total").val(isNaN(total) ? "" : total);
+
+            let sum = 0;
+
+            $('.total').each(function () { // obtiene todos los input que tiene la 'class="total"'
+                let valorTotalRegistro = $(this).val(); //
+                let isNumber = isNaN(parseFloat(valorTotalRegistro)); //valida si no es numerico
+                if(!isNumber){ // cuando es numerico, entra
+                    sum += parseFloat(valorTotalRegistro);
+                }
+            });
+            console.log("--->"+sum)
+            $('#sum').val(sum); // #sum equivale al id del "input" del total
+        });
+    })();
+</script>
+</body>
+</html>
